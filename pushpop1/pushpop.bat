@@ -4,7 +4,7 @@ del 1pushpop.tap
 
 @bas2tap -a10 -sloader loader.bas basloader.tap
 
-pasmo -v --tap pushpop.asm pushpop.tap LUT.sym
+pasmo -v --tap pushpop.asm pushpop.tap pushpop.sym
 
 copy /b basloader.tap + pushpop.tap  1pushpop.tap
 
