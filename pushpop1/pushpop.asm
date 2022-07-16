@@ -112,7 +112,8 @@ push_pop:
 	
 	;lets save our original stack
 	ld (originalStack), sp
-	
+
+
 loop:
 ; sp = #5FE4
 	ld sp, iy; 		10t
@@ -149,22 +150,21 @@ loop:
 	;==96 t-states
 	
 	;adjust our screen
-	;ld sp, (originalStack)	;20t
-	ld bc, $0a				;10t
-	add ix, bc				;15t
+	ld bc, $0a;			10t
+	add ix, bc;			15t
 	;adjust our buffer
-	ld bc, $10				;10t
-	add iy, bc				;15t
-	;==70 t-states
+	ld bc, $10;			10t
+	add iy, bc;			15t
+	;==50 t-states
 	
-	ld sp, iy; buffer
+	ld sp, iy; 		10t		buffer
 	pop bc	;18		10t
 	pop de	;20		10t
 	pop hl	;22		10t
 	exx		;		4t
 	pop bc	;24		10t
 	pop de	;26		10t
-	;==54 t-states
+	;==64 t-states
 	
 	ld sp, ix; 		10t
 	;== 10 t-states
@@ -178,6 +178,7 @@ loop:
 	;==59 t-states
 	
 	ld sp, (originalStack)	;20t
+	;==20 t-states
 	;https://worldofspectrum.org/forums/discussion/comment/315782/#Comment_315782
 	
 	ld d, ixh;		8t
@@ -207,8 +208,8 @@ end_of_next_line:
 	
 	ld ixh, d;		8t
 	ld ixl, e;		8t
-	;==133 to 138
-
+	;==113 to 118
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;iy holds out buffer data
 	ld bc, 10				;10t
 	
@@ -221,12 +222,11 @@ end_of_next_line:
 	jr nz, loop				;12/7 t
 	;==54/59  t-states
 	
-	;sp = #5FE4
-;;end loop	
+;;;end loop	
 ;; entire loop for 1 line is
-;	==584 / 589 t-states
+;	==574 / 584 t-states per line
 
-;LDI method 2 = 506T
+;LDI method 2 = 506T per line
 	
 
 ld sp, (originalStack)
