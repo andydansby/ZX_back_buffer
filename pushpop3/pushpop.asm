@@ -5,7 +5,7 @@
 
 	org $8000
 start:
-	halt
+	;halt
 	di
 	
 	;sp = #5FE8
@@ -66,9 +66,7 @@ push_pop1:
 loop1:
 ; sp = #5FE4
 	ld sp, iy; 		10t
-	;our stack is set to image buffer
-	;== 10 t-states
-	
+	;IY is for the image buffer
 	pop af	;2		10t
 	pop bc	;4		10t
 	pop de	;6		10t
@@ -79,13 +77,11 @@ loop1:
 	pop bc	;12		10t
 	pop de	;14		10t
 	pop hl	;16		10t
-	;==88 t-states
+	;==98 t-states
 	
 	
 	ld sp, ix; 		10t
-	;our stack is set to the screen
-	;== 10 t-states
-	
+	;IX is set for the screen
 	push hl	;16		11t
 	push de	;14		11t
 	push bc	;12		11t
@@ -96,7 +92,7 @@ loop1:
 	push de	;6		11t
 	push bc	;4		11t
 	push af	;2		11t
-	;==96 t-states
+	;==106 t-states
 	
 	;adjust our screen
 	ld bc, $0a;			10t
@@ -104,7 +100,7 @@ loop1:
 	;adjust our buffer
 	ld c, $10;			7t
 	add iy, bc;			15t
-	;==50 t-states
+	;==47 t-states
 	
 	ld sp, iy; 		10t		buffer
 	pop bc	;18		10t
@@ -116,115 +112,88 @@ loop1:
 	;==64 t-states
 	
 	ld sp, ix; 		10t
-	;== 10 t-states
-
 	push de	;26		11t
 	push bc	;24		11t
 	exx		;		4t
 	push hl	;22		11t
 	push de	;20		11t
 	push bc	;18		11t
-	;==59 t-states
+	;==69 t-states
 	
-;$d3c4
-;at this point 
-;IX = $401A
-;needs to be
-;4110
-
-; at the end of 8 lines
-;ix = $471a
-
-;dont read the stack with 
-;ld sp, (xxxx), 
-;it is very expensive
-;also don't copy IX to DE unless you need it
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	inc ixh
-	ld a, ixh
-	and 7
-	jr z, updateIx1
+;optimizations by catmeows
+	inc ixh;		8t
+	ld a, ixh;		8t
+	and 7;			7t
+	jr z, updateIX;12/7t
 	;this happen only once in 8 runs
 	;so it is better to jump relative 
 	;when it happens for 12 ticks
 	;otherwise do nothing for 7 ticks
-	ld a, ixl
-	sub $0A
-	ld ixl, a
+	ld a, ixl;		8t
+	sub $0A;		7t
+	ld ixl, a;		8t
 	
 	
 	;modify buffer
 buffer_update1:
 	;iy holds out buffer data
-	ld bc, 10				;10t	
-	add iy, bc				;15t
+	ld bc, 10;		10t	
+	add iy, bc;		15t
 	
 	;now lets decrease our counter in I
-	ld a, i					;9t
-	dec a					;4t
-	ld i, a					;9t	
+	ld a, i;		9t
+	dec a;			4t
+	ld i, a;		9t	
 	
-	jr nz, loop1				;12/7 t
+	jr nz, loop1;	12/7 t
 	;==54/59  t-states
 
-
-	;halt
 	;when we reach here, we are finished drawing 
 	;1/3 of the screen
 	
-	jr nextthird
+	jr nextthird; now let's just jump to test which 3rd
 
 finished_copy:
 
-	ld sp, (originalStack)
-;sp = #5FE4
-
-
-	;I think I'm having a stack problem with returning
-	pop bc
+	ld sp, (originalStack); back to our original stack
+	pop bc;		restore BC
 ret
 
 
-updateIx1:
+updateIX:
 
-;;entering with $481a
-	;should  exit with $4030
-	;instead exit with $4910
+	ld a, ixh;		8t
+	sub 8;			7t
+	ld ixh, a;		8t
 
- ;update ix and go to continue
- 	;ld sp, (originalStack)	;20t
-	;==20 t-states
+	ld a, ixl;		8t
+	add a, $16;		7t
+	ld ixl, a;		8t
 
-	ld a, ixh;	a = #48
-	sub 8;		a =	#40
-	ld ixh, a;
-
-	ld a, ixl
-	add a, $16
-	ld ixl, a
-
-jr buffer_update1
+jr buffer_update1;12t
 
 
 nextthird:
-	ld a, (screenThird)
-	inc a
-	ld (screenThird), a
-	cp 1
-	jr z, second
-	cp 2
-	jr z, third
-	jp nz, finished_copy
+	ld a, (screenThird); 13t
+	inc a				; 4t
+	ld (screenThird), a; 13t
+	cp 1;				  7t
+	jr z, second;		12/7t
+	cp 2;				  7t
+	jr z, third;		12/7t
+	jp nz, finished_copy; 10t
 
 
 second:
-	ld ix, $4810
-	ld a,64
-	ld i, a
-	jp loop1
+	ld ix, $4810;		14t
+	ld a,64;			 7t
+	ld i, a;			 9t
+	jp loop1;			10t
 	
 third:
-	ld ix, $5010
-	ld a,64
-	ld i, a
-	jp loop1
+	ld ix, $5010;		14t
+	ld a,64;			 7t
+	ld i, a;			 9t
+	jp loop1;			10t
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
