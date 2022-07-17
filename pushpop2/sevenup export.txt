@@ -1,0 +1,19 @@
+in SevenuP
+
+import PNG file
+then
+File > Output options
+GFX only
+
+Sort Priority
+X char
+Char line
+Y char
+
+interleave = Sprite
+
+no other options checked
+
+then
+File > Export Data
+export as girl.BIN
