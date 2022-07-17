@@ -1,5 +1,9 @@
+;optimization suggestions by catmeows
+;https://spectrumcomputing.co.uk/forums/viewtopic.php?t=7632
 
-	org $8000	
+
+
+	org $8000
 start:
 	halt
 	di
