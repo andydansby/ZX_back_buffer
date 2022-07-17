@@ -192,7 +192,7 @@ updateIx1:
 	;instead exit with $4910
 
  ;update ix and go to continue
- 	ld sp, (originalStack)	;20t
+ 	;ld sp, (originalStack)	;20t
 	;==20 t-states
 
 	ld a, ixh;	a = #48
