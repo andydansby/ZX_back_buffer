@@ -1,0 +1,15 @@
+buffer_update1	EQU 0D3D2H
+data		EQU 0C000H
+end_of_data	EQU 0D380H
+endless		EQU 08006H
+finished_copy	EQU 0D3E0H
+loop1		EQU 0D393H
+nextthird	EQU 0D3F8H
+originalStack	EQU 08009H
+push_pop1	EQU 0D380H
+return		EQU 08005H
+screenThird	EQU 0800BH
+second		EQU 0D40AH
+start		EQU 08000H
+third		EQU 0D415H
+updateIx1	EQU 0D3E6H
