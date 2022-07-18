@@ -95,7 +95,7 @@ loop1:
 	; Instead of POP/PUSH AF twice in first block
 	; use POP/PUSH AF once in both blocks. 
 	; This way, you won't need EX AF,AF' anymore.
-	; saves 28t states
+	; saves 28t states per loop
 	ld sp, ix; 		10t
 	;IX is set for the screen
 	push hl	;14		11t
@@ -109,12 +109,16 @@ loop1:
 	;==91 t-states
 	
 ;;;;;;;;;;;;;;;;;;
-	;adjust our screen
-	ld bc, 12;			10t	ld bc, $0a;	
-	add ix, bc;			15t
+
 	;adjust our buffer
-	ld c, 14;			7t
+	ld bc, 14;			7t
 	add iy, bc;			15t
+	;adjust our screen
+	ld c, 12;			10t	ld bc, $0a;	
+	add ix, bc;			15t
+	;we are going to reuse bc
+	;Einar optimization
+	
 	;==47 t-states
 	
 	;;bc = $000E = 14
@@ -122,21 +126,21 @@ loop1:
 	
 	ld sp, iy; 		10t		buffer
 	pop af	;16		10t
-	pop bc	;18		10t
-	pop de	;20		10t
-	pop hl	;22		10t
+	pop de	;18		10t
+	pop hl	;20		10t
 	exx		;		4t
-	pop bc	;24		10t
+	pop bc	;22		10t
+	pop hl	;24		10t
 	pop de	;26		10t
 	;==74 t-states
 	
 	ld sp, ix; 		10t
 	push de	;26		11t
-	push bc	;24		11t
+	push hl	;24		11t
+	push bc	;22		11t
 	exx		;		4t
 	push hl	;22		11t
 	push de	;20		11t
-	push bc	;18		11t
 	push af	;16		11t
 	;==80 t-states
 
@@ -152,8 +156,19 @@ loop1:
 	;when it happens for 12 ticks
 	;otherwise do nothing for 7 ticks
 	ld a, ixl;		8t
-	sub 12;		7t	$0A;
+	
+	
+	;Instead of POP/PUSH BC twice in second block, 
+	;use POP/PUSH HL twice in second block. 
+	;This way, you can reuse the same value of BC 
+	;that you have set between both POP/PUSH blocks.
+	;Einar Saukas optimization  Reuse C of BC
+	;	sub 12;		7t	$0A;
+	sub C;		4t
 	;move back 12 character spaces
+	;reused C as it is already in BC from above
+	;C = 12
+	
 	ld ixl, a;		8t
 	
 	
@@ -161,8 +176,16 @@ loop1:
 buffer_update1:
 	;iy holds out buffer data
 	
-	ld bc, 12
+	;ld bc, 12;		10t
 	;add 12 character spaces in buffer
+	;Instead of POP/PUSH BC twice in second block, 
+	;use POP/PUSH HL twice in second block. 
+	;This way, you can reuse the same value of BC 
+	;that you have set between both POP/PUSH blocks.
+	;Einar Saukas optimization  Reuse C of BC
+	;reused C as it is already in BC from above
+	
+	
 	add iy, bc;		15t
 	
 	;now lets decrease our counter in I
