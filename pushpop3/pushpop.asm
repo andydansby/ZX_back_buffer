@@ -1,6 +1,14 @@
 ;optimization suggestions by catmeows
 ;https://spectrumcomputing.co.uk/forums/viewtopic.php?t=7632
 
+;catmeows optimizations save from 77t to 82t per loop
+
+
+
+
+
+
+
 
 
 	org $8000
@@ -36,21 +44,13 @@ push_pop1:
 
 	ld b, 0		;the first entry in the LUT
 	push bc		;save to stack for when we update the loop
-	
-	; sp = #5FE4
-	;call coords_to_address
-	; uses the B register to calculate pixel row
-	;results in ix
-	; sp = #5FE4
-	
+
 	ld ix, $4010
 	
 	ld iy, data
 	;iy holds out buffer data
 	
 	;i of ir is going to be our loop data
-	;ld a, (loopsteps)	; temp to be replaced with below	
-	;ld a,192
 	ld a,64
 	ld i, a
 	
@@ -134,11 +134,17 @@ loop1:
 	sub $0A;		7t
 	ld ixl, a;		8t
 	
+	;was 50
+	;now 53/58
+	
 	
 	;modify buffer
 buffer_update1:
 	;iy holds out buffer data
-	ld bc, 10;		10t	
+	
+	;ld bc, 10;		10t	
+	ld bc, 10
+	
 	add iy, bc;		15t
 	
 	;now lets decrease our counter in I
