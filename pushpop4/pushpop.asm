@@ -36,8 +36,8 @@ end_of_data:
 push_pop1:
 ;on entry stack is #5FE6
 
-	ld b, 0		;the first entry in the LUT
-	push bc		;save to stack for when we update the loop
+	;ld b, 0		;the first entry in the LUT
+	;push bc		;save to stack for when we update the loop
 	
 	; sp = #5FE4
 	;call coords_to_address
@@ -208,7 +208,7 @@ buffer_update1:
 finished_copy:
 
 	ld sp, (originalStack); back to our original stack
-	pop bc;		restore BC
+	;pop bc;		restore BC
 ret
 
 setup_next_pass:
